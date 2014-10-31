@@ -1,3 +1,6 @@
+
+
+
 --Most Winningest Cabbies
 -------------------------
 
@@ -259,9 +262,33 @@ distance,pickup_latitude,pickup_longitude,dropoff_latitude,dropoff_longitude,tot
 10.64,40.750671,-73.990677,40.690357,-74.177666,99.97,23.07,23,DF63BC97C7C9923DA6B6EE1448AC5A43
 
 
+-- Tips
+-------
+
+SELECT 
+  INTEGER(ROUND(FLOAT(tip_amount) / FLOAT(fare_amount) * 100)) tip_pct,
+  count(*) trips
+FROM [833682135931:nyctaxi.trip_fare] 
+WHERE payment_type='CRD' and float(fare_amount) > 0.00
+GROUP BY tip_pct
+ORDER BY tip_pct 
 
 
+-- Tips grouped by geo blocks
+-----------------------------
 
-
+SELECT
+  CONCAT(STRING(ROUND(FLOAT(trip_data.pickup_latitude), 4)), ',', STRING(ROUND(FLOAT(trip_data.pickup_longitude), 4))) AS pickup_latlon,
+  COUNT(*) AS trips,
+  ROUND(AVG(trip_fare.total_amount), 2) AS avg_fare,
+  ROUND(AVG(trip_fare.tip_amount), 2) AS avg_tip,
+  INTEGER(AVG((FLOAT(trip_fare.tip_amount) / FLOAT(trip_fare.total_amount))*100)) AS avg_tip_percent
+FROM
+ [833682135931:nyctaxi.trip_data] AS trip_data
+JOIN EACH [833682135931:nyctaxi.trip_fare] AS trip_fare
+ON trip_data.medallion = trip_fare.medallion AND trip_data.pickup_datetime = trip_fare.pickup_datetime
+WHERE FLOAT(trip_data.pickup_longitude) != 0 AND FLOAT(trip_data.pickup_latitude) != 0
+GROUP EACH BY pickup_latlon
+ORDER BY trips DESC
 
 
