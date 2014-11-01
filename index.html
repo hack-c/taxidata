@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Googlemaps Heatmap Plugin Example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="This example shows a googlemaps heatmap layer example for the heatmap.js gmaps plugin" />
+  <meta name="keywords" content="gmaps heatmap, googlemaps heatmap" />
+  <link rel="stylesheet" href="assets/css/commons.css" />
+  <link rel="stylesheet" href="assets/css/example-commons.css" />
+  <link rel="stylesheet" href="assets/third-party/prism/prism.css" />
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>  
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Gmaps Heatmap Example</h1>
+    <ol class="breadcrumb-trail">
+        <li><a href="//www.patrick-wied.at/static/heatmapjs/" title="heatmap.js dynamic heatmaps for the web">heatmap.js</a></li>
+        <li><a href="//www.patrick-wied.at/static/heatmapjs/examples.html" title="list of heatmap.js examples">Heatmap Examples</a></li>
+        <li>Gmaps Heatmap Example</li>
+    </ol>
+    This example shows a googlemaps heatmap layer example for the heatmap.js gmaps plugin. Since it's a plugin make sure you don't forget to include <strong>gmaps-heatmap.js</strong>
+    <button class="thankyou btn">thank you, this example was useful</button>
+      <br style="clear:both" />
+    <h2>Demo</h2>
+    <div class="demo-wrapper">
+      <div class="heatmap" id="map-canvas">
+
+      </div>
+    </div>
+    <h2>Code</h2>
+    <pre><code class="language-javascript">// don't forget to add gmaps-heatmap.js
+var myLatlng = new google.maps.LatLng(25.6586, -80.3568);
+// map options,
+var myOptions = {
+  zoom: 3,
+  center: myLatlng
+};
+// standard map
+map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+// heatmap layer
+heatmap = new HeatmapOverlay(map, 
+  {
+    // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+    "radius": 2,
+    "maxOpacity": 1, 
+    // scales the radius based on map zoom
+    "scaleRadius": true, 
+    // if set to false the heatmap uses the global maximum for colorization
+    // if activated: uses the data maximum within the current map boundaries 
+    //   (there will always be a red spot with useLocalExtremas true)
+    "useLocalExtrema": true,
+    // which field name in your data represents the latitude - default "lat"
+    latField: 'lat',
+    // which field name in your data represents the longitude - default "lng"
+    lngField: 'lng',
+    // which field name in your data represents the data value - default "value"
+    valueField: 'count'
+  }
+);
+
+var testData = {
+  max: 8,
+  data: [{lat: 24.6408, lng:46.7728, count: 3},{lat: 50.75, lng:-1.55, count: 1}, ...]
+};
+
+heatmap.setData(testData);</code></pre>
+  </div>
+  <script src="assets/js/heatmap.min.js"></script>
+  <script src="assets/js/gmaps-heatmap.js"></script>
+  <script>
+    window.onload = function() {
+
+        $.ajax({
+          url: "data/raw/precision3.json",
+           //force to handle it as text
+          dataType: "text",
+            success: function (dataTest) {
+
+                //data downloaded so we call parseJSON function 
+                //and pass downloaded data
+                var json = $.parseJSON(dataTest);
+
+
+             }
+        });
+
+        // map center
+        var myLatlng = new google.maps.LatLng(40.7, -73.9);
+        // map options,
+        var myOptions = {
+          zoom: 11,
+          center: myLatlng
+        };
+        // standard map
+        map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+        // heatmap layer
+        heatmap = new HeatmapOverlay(map, 
+          {
+            // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+            "radius": 2,
+            "maxOpacity": 1, 
+            // scales the radius based on map zoom
+            "scaleRadius": true, 
+            // if set to false the heatmap uses the global maximum for colorization
+            // if activated: uses the data maximum within the current map boundaries 
+            //   (there will always be a red spot with useLocalExtremas true)
+            "useLocalExtrema": true,
+            // which field name in your data represents the latitude - default "lat"
+            latField: 'lat',
+            // which field name in your data represents the longitude - default "lng"
+            lngField: 'lng',
+            // which field name in your data represents the data value - default "value"
+            valueField: 'trips'
+          }
+        );
+
+        heatmap.setData(json);
+
+    };
+  </script>
+  <script src="assets/third-party/prism/prism.js"></script>
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://www.patrick-wied.at/helper/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 1]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="http://www.patrick-wied.at/helper/piwik/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+</body>
+</html>

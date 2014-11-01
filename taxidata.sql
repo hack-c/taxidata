@@ -278,7 +278,9 @@ ORDER BY tip_pct
 -----------------------------
 
 SELECT
-  CONCAT(STRING(ROUND(FLOAT(trip_data.pickup_latitude), 4)), ',', STRING(ROUND(FLOAT(trip_data.pickup_longitude), 4))) AS pickup_latlon,
+  CONCAT(STRING(ROUND(FLOAT(trip_data.pickup_latitude), 4)), ',', STRING(ROUND(FLOAT(trip_data.pickup_longitude), 4))) AS geobox,
+  ROUND(AVG(FLOAT(trip_data.pickup_latitude)), 4) as lat,
+  ROUND(AVG(FLOAT(trip_data.pickup_longitude)), 4) as lon,
   COUNT(*) AS trips,
   ROUND(AVG(trip_fare.total_amount), 2) AS avg_fare,
   ROUND(AVG(trip_fare.tip_amount), 2) AS avg_tip,
@@ -288,7 +290,7 @@ FROM
 JOIN EACH [833682135931:nyctaxi.trip_fare] AS trip_fare
 ON trip_data.medallion = trip_fare.medallion AND trip_data.pickup_datetime = trip_fare.pickup_datetime
 WHERE FLOAT(trip_data.pickup_longitude) != 0 AND FLOAT(trip_data.pickup_latitude) != 0
-GROUP EACH BY pickup_latlon
+GROUP EACH BY geobox
 ORDER BY trips DESC
 
 
