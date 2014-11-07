@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from optparse import OptionParser
 
 
 # parse commandline arguments
@@ -26,7 +27,8 @@ if __name__ == '__main__':
     fname = opts.csv_path.split('/')[-1][:-4]
 
     df = pd.read_csv(opts.csv_path)
-    df = df[df.trips > 5]
+    df = df[df.trips > 10]
     df = df[~df.distance.isnull()]
+    df = df[((40.751 - df.lat)**2 + (-73.994 - df.lon)**2)**0.5 < 2]
     df = df[['lat','lon','distance']]
     df.to_csv('data/processed/' + fname + '_processed.csv')
