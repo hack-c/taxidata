@@ -294,3 +294,66 @@ GROUP EACH BY geobox
 ORDER BY trips DESC
 
 
+-- Laziest neighborhoods
+------------------------
+
+SELECT
+  CONCAT(STRING(ROUND(FLOAT(trip_data.pickup_latitude), 3)), '|', STRING(ROUND(FLOAT(trip_data.pickup_longitude), 3))) AS geobox,
+  ROUND(AVG(FLOAT(trip_data.pickup_latitude)), 3) as lat,
+  ROUND(AVG(FLOAT(trip_data.pickup_longitude)), 3) as lon,
+  COUNT(*) AS trips,
+  ROUND(AVG(3959 * acos( cos(radians(FLOAT(trip_data.pickup_latitude)))*cos(radians(FLOAT(trip_data.dropoff_latitude)))*cos(radians(FLOAT(trip_data.dropoff_longitude))-radians(FLOAT(trip_data.pickup_longitude))) + sin(radians(FLOAT(trip_data.pickup_latitude)))*sin(radians(FLOAT(trip_data.dropoff_latitude))) ) ,2)) AS distance, --haversine formula.
+FROM
+ [833682135931:nyctaxi.trip_data] AS trip_data
+WHERE FLOAT(trip_data.pickup_longitude) != 0 AND FLOAT(trip_data.pickup_latitude) != 0
+GROUP EACH BY geobox
+ORDER BY trips DESC
+
+
+-- Dropoff density
+------------------
+
+SELECT
+  CONCAT(STRING(ROUND(FLOAT(trip_data.dropoff_latitude), 3)), '|', STRING(ROUND(FLOAT(trip_data.dropoff_longitude), 3))) AS geobox,
+  ROUND(AVG(FLOAT(trip_data.dropoff_latitude)), 3) as lat,
+  ROUND(AVG(FLOAT(trip_data.dropoff_longitude)), 3) as lon,
+  COUNT(*) AS trips,
+  ROUND(AVG(trip_fare.total_amount), 2) AS avg_fare,
+  ROUND(AVG(trip_fare.tip_amount), 2) AS avg_tip,
+  INTEGER(AVG((FLOAT(trip_fare.tip_amount) / FLOAT(trip_fare.total_amount))*100)) AS avg_tip_percent
+FROM
+ [833682135931:nyctaxi.trip_data] AS trip_data
+JOIN EACH [833682135931:nyctaxi.trip_fare] AS trip_fare
+ON trip_data.medallion = trip_fare.medallion AND trip_data.pickup_datetime = trip_fare.pickup_datetime
+WHERE FLOAT(trip_data.pickup_longitude) != 0 AND FLOAT(trip_data.pickup_latitude) != 0
+GROUP EACH BY geobox
+ORDER BY trips DESC
+
+
+
+-- Total trips: 187287452
+-- Trips with 0 tip: 89099496
+
+-- Total CRD trips: 101089735
+-- Total CRD trips with 0 tip: 3133890
+
+
+
+-- Most common trips
+--------------------
+
+SELECT
+  CONCAT(STRING(ROUND(FLOAT(trip_data.pickup_latitude), 3)), '|', STRING(ROUND(FLOAT(trip_data.pickup_longitude), 3)), '|', CONCAT(STRING(ROUND(FLOAT(trip_data.dropoff_latitude), 3)), '|', STRING(ROUND(FLOAT(trip_data.dropoff_longitude), 3)))) AS trip_string,
+  COUNT(*) AS trips,
+  ROUND(AVG(trip_fare.total_amount), 2) AS avg_fare,
+  ROUND(AVG(trip_fare.tip_amount), 2) AS avg_tip,
+  INTEGER(AVG((FLOAT(trip_fare.tip_amount) / FLOAT(trip_fare.total_amount))*100)) AS avg_tip_percent
+FROM
+ [833682135931:nyctaxi.trip_data] AS trip_data
+JOIN EACH [833682135931:nyctaxi.trip_fare] AS trip_fare
+ON trip_data.medallion = trip_fare.medallion AND trip_data.pickup_datetime = trip_fare.pickup_datetime
+WHERE FLOAT(trip_data.pickup_longitude) != 0 AND FLOAT(trip_data.pickup_latitude) != 0
+GROUP EACH BY trip_string
+ORDER BY trips DESC
+LIMIT 20
+
