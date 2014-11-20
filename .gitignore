@@ -1,6 +1,3 @@
 bin/*
-data/raw/pickup_density.csv
 .ipynb_checkpoints/
-data/raw/*
-data/processed/
 data/*
