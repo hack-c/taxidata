@@ -2,3 +2,4 @@ bin/*
 .ipynb_checkpoints/
 data/*
 data/raw/*
+data/raw/precision3.json
